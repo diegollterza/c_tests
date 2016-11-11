@@ -23,44 +23,59 @@ typedef struct Base{
     struct Base *prox;
 } Base;
 
- int verificaCodigo(char *codigo, Base *head){
+ int verificaCodigo(char cod[8], Base *head){
     Base *aux = head;
     while(aux!=NULL){
-        if(strcmp(aux->cod, codigo)==0){
+        if(strcmp(aux->cod, cod)==0){
+            printf("Retornado True \n");
             return true;
         }
-        printf("%s", aux->apelido);
         aux = aux->prox;
     }
     return false;
  }
 
- void imprimeBases(Base *head){
-    Base *aux = head;
-    while(aux!=NULL){
-        printf("%s \n", aux->cod);
-        aux = aux->prox;
+ void imprimeBase(Base base){
+        printf("%s \n", base.cod);
+        printf("%s \n", base.apelido);
+        printf("%c \n", base.tipo);
+        printf("%d \n", base.capacidade);
+        printf("%d \n", base.espacoOcupado);
+        printf("%.2f \n", base.valorArmazenado);
     }
-
-
-
+ void imprimeRecurso(Recurso recurso){
+    printf("%d \n", recurso.cod);
+    printf("%d \n", recurso.tam);
+    printf("%c \n", recurso.tipo);
+    printf("%.2f \n", recurso.preco);
  }
+
 
  Base * cadastrarBase(Base *head){
     Base *aux = head;
     Base *novo = malloc(sizeof(Base));
+    char cod[8];
+    char apelido[255];
+    char tipo;
+    int capacidade;
     printf("Entre com o código \n");
-    scanf("%s", novo->cod);
-    while(verificaCodigo(novo->cod, head)){
+    scanf("%s", cod);
+    /*while(verificaCodigo(cod, head)){
         printf("Codigo ja existente.\n");
-        scanf("%s", novo->cod);
-    }
+        scanf("%s", cod);
+    }*/
+
     printf("Entre com o Apelido \n");
-    scanf("%s", novo->apelido);
+    scanf("%s", apelido);
     printf("Entre com o Tipo \n");
-    scanf(" %c", &novo->tipo);
+    scanf(" %c", &tipo);
     printf("Entre com a capacidade \n");
-    scanf("%d", &novo->capacidade);
+    scanf("%d", &capacidade);
+    printf("%s \n", cod);
+    strcpy(novo->cod,cod);
+    //strcpy(novo->apelido,apelido);
+    novo->tipo = tipo;
+    novo->capacidade = capacidade;
     novo->espacoOcupado = 0;
     novo->valorArmazenado = 0;
     novo->Recursos = NULL;
@@ -72,16 +87,18 @@ typedef struct Base{
         aux = aux->prox;
     }
     aux = novo;
+    printf("%s \n", aux->cod);
     return head;
  }
 
-void cadastrarRecurso(Base *head){
+
+Base * cadastrarRecurso(Base *head){
     Base *aux = head;
     Recurso * novo = malloc(sizeof(Recurso));
     char cod[8];
     printf("Digite o codigo da base na qual deseja adcionar o recurso:\n");
     scanf("%s", cod);
-    while(!verificaCodigo(cod,head)){
+    while(verificaCodigo(cod,head)==false){
         printf("Codigo nao existe.\n");
         scanf("%s", cod);
     }
@@ -99,13 +116,49 @@ void cadastrarRecurso(Base *head){
     }
     novo->prox = aux->Recursos;
     aux->Recursos = novo;
+    return head;
 }
+
+ void removerUltimoRecurso(Base *head, char cod[8]){
+    Base *aux = head;
+    Recurso *r_aux = NULL;
+    Recurso *r_ant = NULL;
+    while(aux!=NULL){
+        if(strcmp(aux->cod,cod)==0){
+            break;
+        }
+        aux = aux->prox;
+    }
+
+    if(aux == NULL){
+        printf("Codigo nao encontrado. \n");
+        return;
+    }
+
+    if(aux->Recursos==NULL){
+        printf("Base nao possui recursos \n");
+        return;
+    }
+    r_aux = aux->Recursos;
+    if(r_aux->prox == NULL){
+        aux->Recursos = NULL;
+        free(r_aux);
+        return;
+    }
+
+    while(r_aux->prox!=NULL){
+        r_ant = r_aux;
+        r_aux = r_aux->prox;
+    }
+    free(r_aux);
+    r_ant->prox= NULL;
+ }
 
  int main(){
     Base *head = NULL;
     head = cadastrarBase(head);
-    printf("%s",head->apelido);
-    imprimeBases(head);
-    //cadastrarRecurso(head);
+    //printf("%s",head->apelido);
+    head = cadastrarRecurso(head);
+    removerUltimoRecurso(head, "12345678");
     return 0;
  }
