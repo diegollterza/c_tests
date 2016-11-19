@@ -95,7 +95,7 @@ Base * cadastrarRecurso(Base *head){
     printf("Digite o codigo do Recurso \n");
     scanf("%d", &novo->cod);
     printf("Digite o tipo do Recurso \n");
-    scanf("%c", &novo->tipo);
+    scanf(" %c", &novo->tipo);
     printf("Digite o tamanho do Recurso \n");
     scanf("%d", &novo->tam);
     printf("Digite o preco do Recurso \n");
