@@ -13,14 +13,14 @@ typedef struct Recurso{
  } Recurso;
 
 typedef struct Base{
-    char cod[8];
-    char apelido[255];
-    char tipo;
     int capacidade;
+    char tipo;
     int espacoOcupado;
     float valorArmazenado;
     Recurso *Recursos;
     struct Base *prox;
+    char apelido[255];
+    char cod[8];
 } Base;
 
  int verificaCodigo(char cod[8], Base *head){
@@ -54,28 +54,19 @@ typedef struct Base{
  Base * cadastrarBase(Base *head){
     Base *aux = head;
     Base *novo = malloc(sizeof(Base));
-    char cod[8];
-    char apelido[255];
-    char tipo;
-    int capacidade;
     printf("Entre com o código \n");
-    scanf("%s", cod);
-    /*while(verificaCodigo(cod, head)){
+    scanf("%s", novo->cod);
+    while(verificaCodigo(novo->cod, head)){
         printf("Codigo ja existente.\n");
-        scanf("%s", cod);
-    }*/
+        scanf("%s ", novo->cod);
+    }
 
     printf("Entre com o Apelido \n");
-    scanf("%s", apelido);
+    scanf(" %s", novo->apelido);
     printf("Entre com o Tipo \n");
-    scanf(" %c", &tipo);
+    scanf(" %c", &novo->tipo);
     printf("Entre com a capacidade \n");
-    scanf("%d", &capacidade);
-    printf("%s \n", cod);
-    strcpy(novo->cod,cod);
-    //strcpy(novo->apelido,apelido);
-    novo->tipo = tipo;
-    novo->capacidade = capacidade;
+    scanf("%d", &novo->capacidade);
     novo->espacoOcupado = 0;
     novo->valorArmazenado = 0;
     novo->Recursos = NULL;
@@ -87,7 +78,6 @@ typedef struct Base{
         aux = aux->prox;
     }
     aux = novo;
-    printf("%s \n", aux->cod);
     return head;
  }
 
@@ -157,8 +147,8 @@ Base * cadastrarRecurso(Base *head){
  int main(){
     Base *head = NULL;
     head = cadastrarBase(head);
-    //printf("%s",head->apelido);
+    printf("%s",head->cod);
     head = cadastrarRecurso(head);
-    removerUltimoRecurso(head, "12345678");
+    //removerUltimoRecurso(head, "12345678");
     return 0;
  }
