@@ -88,7 +88,7 @@ Base * cadastrarRecurso(Base *head){
     char cod[8];
     printf("Digite o codigo da base na qual deseja adcionar o recurso:\n");
     scanf("%s", cod);
-    while(verificaCodigo(cod,head)==false){
+    while(!verificaCodigo(cod,head)){
         printf("Codigo nao existe.\n");
         scanf("%s", cod);
     }
@@ -101,15 +101,17 @@ Base * cadastrarRecurso(Base *head){
     printf("Digite o preco do Recurso \n");
     scanf("%f", &novo->preco);
 
-    while(aux->cod != cod){
+    while(strcmp(aux->cod,cod)!=0){
         aux = aux->prox;
     }
+
     novo->prox = aux->Recursos;
     aux->Recursos = novo;
+    aux->espacoOcupado = calculaCapacidade(aux);
     return head;
 }
 
- void removerUltimoRecurso(Base *head, char cod[8]){
+ Base * removerUltimoRecurso(Base *head, char cod[8]){
     Base *aux = head;
     Recurso *r_aux = NULL;
     Recurso *r_ant = NULL;
@@ -131,6 +133,7 @@ Base * cadastrarRecurso(Base *head){
     }
     r_aux = aux->Recursos;
     if(r_aux->prox == NULL){
+    	printf("%d \n", r_aux->cod);
         aux->Recursos = NULL;
         free(r_aux);
         return;
@@ -140,15 +143,149 @@ Base * cadastrarRecurso(Base *head){
         r_ant = r_aux;
         r_aux = r_aux->prox;
     }
+    aux->espacoOcupado = calculaCapacidade(aux);
+    printf("%d \n", r_aux->cod);
     free(r_aux);
     r_ant->prox= NULL;
+    return head;
  }
 
+int hasRecursoTipo(Base * head, char tipo){
+	Recurso * aux = head->Recursos;
+	while(aux){
+		if(aux->tipo == tipo){
+			return true;
+		}
+		aux = aux->prox;
+	}
+	return false;
+}
+
+void listarBases(Base * head, char tipo){
+	while(head){
+		if(hasRecursoTipo(head, tipo)){
+			printf("%s \n", head->apelido);
+		}
+		head = head->prox;
+	}
+}
+
+int calculaCapacidade(Base * head){
+	int soma = 0;
+	Recurso * aux = head->Recursos;
+
+	while(aux){
+		soma += aux->tam;
+		aux = aux->prox;
+	}
+	return soma;
+}
+
+void listarBasesLimite(Base * head){
+	while(head != NULL){
+		if(head->capacidade < head->espacoOcupado){
+			printf("%s \n", head->apelido);
+		}
+		head = head->prox;
+	}
+}
+Base * moverRecursoBase(Base * head, char origem[8], char destino[8]){
+	Base * b_origem = NULL;
+	Base * b_destino = NULL;
+	Base * aux = head;
+	Recurso * r_origem = NULL;
+	Recurso * r_destino = NULL;
+	Recurso * r_aux = NULL;
+	while(aux){
+		if (strcmp(aux->cod, origem)==0){
+			b_origem = aux;
+		}
+		aux = aux->prox;
+	}
+	if(!b_origem){
+		printf("Base origem nao encontrada. \n");
+		return;
+	}
+	aux = head;
+	while(aux){
+		if (strcmp(aux->cod, destino)==0){
+			b_destino = aux;
+		}
+		aux = aux->prox;
+	}
+	if(!b_destino){
+		printf("Base destino nao encontrada. \n");
+		return;
+	}
+	r_origem = b_origem->Recursos;
+	r_destino = b_destino->Recursos;
+	
+	while(r_origem){
+		r_aux = r_origem;
+		r_aux->prox = r_destino;
+		r_destino = r_aux;
+		r_origem = r_origem->prox;
+	}
+	return head;
+}
+
+void ListarTudo(Base * head){
+	Recurso  *aux = NULL;
+	while(head){
+		printf("%s \n", head->apelido);
+		aux = head->Recursos;
+		while(aux){
+			printf("%d %c \n", aux->cod, aux->tipo);
+			aux = aux->prox;
+		}
+		head = head->prox;
+	}
+}
+
+void printMenu(){
+    printf("############################MENU############################## \n");
+    printf("1 - Cadastrar Base\n");
+    printf("2 - Cadastrar Recurso\n");
+    printf("3 - Remover Ultimo Recurso\n");
+    printf("4 - Listar Recursos da Base\n");
+    printf("5 - Listar Bases excedido limite\n");
+    printf("6 - Mover recursos entre Bases\n");
+    printf("7 - Listar todas as Bases e Recursos\n");
+    printf("8 - Sair \n");
+}
+
  int main(){
+    int menu = 0;
     Base *head = NULL;
-    head = cadastrarBase(head);
-    printf("%s",head->cod);
-    head = cadastrarRecurso(head);
-    //removerUltimoRecurso(head, "12345678");
+    char origem[8];
+    char destino[8];
+    char tipo;
+	char cod[8];
+	while(menu!=8){
+		printMenu();
+		scanf("%d", &menu);
+    	switch(menu){
+    		case 1:
+    			head = cadastrarBase(head);
+    		case 2:
+    			head = cadastrarRecurso(head);
+    		case 3:
+    			scanf("%s", cod);
+    			head = removerUltimoRecurso(head, cod);
+  		  	case 4:
+    			scanf(" %c", &tipo);
+    			listarBases(head, tipo);
+	    	case 5:
+    			listarBasesLimite(head);
+    		case 6:
+    			scanf("%s", origem);
+    			scanf("%s", destino);
+    			head = moverRecursoBase(head, origem, destino);
+    		case 7:
+    			ListarTudo(head);
+    		case 8:
+    			break;
+    	}	
+    }
     return 0;
  }
